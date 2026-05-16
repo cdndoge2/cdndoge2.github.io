@@ -19,6 +19,7 @@
     --muted: rgba(232,232,240,0.45);
     --accent: #6c63ff;
     --accent2: #ff6584;
+    --status-color: #6b7280;
   }
 
   html, body { min-height: 100vh; width: 100%; }
@@ -34,7 +35,6 @@
     position: relative;
   }
 
-  /* GIF background */
   body::before {
     content: '';
     position: fixed;
@@ -44,7 +44,6 @@
     pointer-events: none;
   }
 
-  /* Dark overlay */
   body::after {
     content: '';
     position: fixed;
@@ -103,19 +102,20 @@
     border: 2px solid var(--border-bright);
     display: block;
     background: linear-gradient(135deg, #6c63ff 0%, #43e6b5 100%);
+    position: relative;
+    z-index: 1;
   }
 
   .avatar-ring {
     position: absolute;
     inset: -4px;
     border-radius: 50%;
-    background: conic-gradient(from 180deg, #6c63ff, #ff6584, #43e6b5, #6c63ff);
-    z-index: -1;
-    animation: spin 4s linear infinite;
-    opacity: 0.7;
+    background: var(--status-color);
+    z-index: 0;
+    opacity: 0.9;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--status-color) 55%, transparent);
+    transition: background 0.25s ease, box-shadow 0.25s ease;
   }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
 
   .avatar-ring::after {
     content: '';
@@ -134,7 +134,7 @@
     border-radius: 50%;
     background: #43e6b5;
     border: 2px solid var(--bg);
-    z-index: 1;
+    z-index: 2;
     animation: pulse 2.5s ease-in-out infinite;
   }
 
@@ -196,11 +196,11 @@
   .ic-steam   { color: #66c0f4; }
 
   .social-link img {
-  width: 13px;
-  height: 13px;
-  display: block;
-  object-fit: contain;
- }
+    width: 13px;
+    height: 13px;
+    display: block;
+    object-fit: contain;
+  }
 
   .divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
 
@@ -390,9 +390,9 @@
         <a class="social-link ic-steam" href="https://steamcommunity.com/id/cdndoge" target="_blank" title="Steam">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg>
         </a>
-	<a class="social-link ic-tux" href="https://tux.cdndoge.com" target="_blank" rel="noopener noreferrer" title="Tux">
-  	  <img src="https://github.com/cdndoge/cdndoge.github.io/blob/master/assets/img/b2nzy.png?raw=true" alt="Tux" />
-	</a>
+        <a class="social-link ic-tux" href="https://tux.cdndoge.com" target="_blank" rel="noopener noreferrer" title="Tux">
+          <img src="https://github.com/cdndoge/cdndoge.github.io/blob/master/assets/img/b2nzy.png?raw=true" alt="Tux" />
+        </a>
       </div>
     </div>
   </div>
@@ -577,45 +577,89 @@
     });
   });
 
-const discordBtn = document.getElementById("discordBtn");
+  const discordBtn = document.getElementById("discordBtn");
 
-if (discordBtn) {
-  discordBtn.addEventListener("click", (e) => {
-    e.preventDefault();
+  if (discordBtn) {
+    discordBtn.addEventListener("click", (e) => {
+      e.preventDefault();
 
-    navigator.clipboard.writeText("cdndoge").then(() => {
-      const original = discordBtn.innerHTML;
+      navigator.clipboard.writeText("cdndoge").then(() => {
+        const original = discordBtn.innerHTML;
+        discordBtn.innerHTML = "✓";
 
-      discordBtn.innerHTML = "✓";
-
-      setTimeout(() => {
-        discordBtn.innerHTML = original;
-      }, 1200);
-    }).catch(() => {
-      alert("Failed to copy Discord username");
+        setTimeout(() => {
+          discordBtn.innerHTML = original;
+        }, 1200);
+      }).catch(() => {
+        alert("Failed to copy Discord username");
+      });
     });
-  });
-}
-
-function updateETTime() {
-  const now = new Date();
-
-  const etString = now.toLocaleString("en-US", {
-    timeZone: "America/New_York",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true
-  });
-
-  const el = document.getElementById("et-time");
-  if (el) {
-    el.textContent = `It's currently ${etString} for me.`;
   }
-}
 
-updateETTime();
-setInterval(updateETTime, 1000);
+  function updateETTime() {
+    const now = new Date();
 
+    const etString = now.toLocaleString("en-US", {
+      timeZone: "America/New_York",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true
+    });
+
+    const el = document.getElementById("et-time");
+    if (el) {
+      el.textContent = `It's currently ${etString} for me.`;
+    }
+  }
+
+  updateETTime();
+  setInterval(updateETTime, 1000);
+
+  const USER_ID = "751617471806570497";
+  const ring = document.querySelector(".avatar-ring");
+  const statusDot = document.querySelector(".status-dot");
+
+  function setStatusColor(status) {
+    let color = "#6b7280";
+
+    switch (status) {
+      case "online":
+        color = "#43e6b5";
+        break;
+      case "idle":
+        color = "#facc15";
+        break;
+      case "dnd":
+        color = "#ef4444";
+        break;
+      case "offline":
+      default:
+        color = "#6b7280";
+        break;
+    }
+
+    document.documentElement.style.setProperty("--status-color", color);
+    if (statusDot) statusDot.style.background = color;
+  }
+
+  async function updateDiscordStatus() {
+    try {
+      const res = await fetch(`https://api.lanyard.rest/v1/users/${USER_ID}`);
+      const data = await res.json();
+
+      if (!data.success || !data.data) {
+        setStatusColor("offline");
+        return;
+      }
+
+      setStatusColor(data.data.discord_status || "offline");
+    } catch (err) {
+      setStatusColor("offline");
+    }
+  }
+
+  updateDiscordStatus();
+  setInterval(updateDiscordStatus, 15000);
 </script>
 
 </body>
